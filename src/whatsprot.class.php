@@ -45,10 +45,11 @@ class WhatsProt
     const WHATSAPP_REQUEST_HOST = 'v.whatsapp.net/v2/code';      // The request code host.
     const WHATSAPP_SERVER = 's.whatsapp.net';               // The hostname used to login/send messages.
     const WHATSAPP_UPLOAD_HOST = 'https://mms.whatsapp.net/client/iphone/upload.php'; // The upload host.
+    const WHATSAPP_VER_CHECKER = 'http://www.whatsapp.com/android/current/WhatsApp.version';
+
     const WHATSAPP_DEVICE = 'Android';                      // The device name.
     const WHATSAPP_VER = '2.11.407';                // The WhatsApp version.
     const WHATSAPP_USER_AGENT = 'WhatsApp/2.11.407 Android/4.3 Device/GalaxyS3'; // User agent used in request/registration code.
-    const WHATSAPP_VER_CHECKER = 'http://www.whatsapp.com/android/current/WhatsApp.version';
 
     /**
      * Property declarations.
@@ -79,6 +80,11 @@ class WhatsProt
     protected $socket;                  // A socket to connect to the WhatsApp network.
     protected $writer;                  // An instance of the BinaryTreeNodeWriter class.
 
+    protected $cfgOverride;             // Externally defined configuration
+    protected $whDevice;                // Device as configured (static/override)
+    protected $whVersion;               // Whatsapp version as configured (static/override)
+    protected $whUserAgent;             // User Agent version as configured (static/override)
+
     /**
      * Default class constructor.
      *
@@ -91,13 +97,18 @@ class WhatsProt
      *   The user name.
      * @param $debug
      *   Debug on or off, false by default.
+     * @param array $cfg
+     *   Override hardcoded parameters with YAML ones.
      */
-    public function __construct($number, $identity, $nickname, $debug = false)
+    public function __construct($number, $identity, $nickname, $debug = false, $cfg = array())
     {
         $this->writer = new BinTreeNodeWriter();
         $this->reader = new BinTreeNodeReader();
         $this->debug = $debug;
         $this->phoneNumber = $number;
+
+        $this->applyConfigurationOverridesWith($cfg);
+
         if (!$this->checkIdentity($identity)) {
             //compute identity with pseudo_random_bytes
             $this->identity = $this->buildIdentity($identity);
@@ -105,6 +116,7 @@ class WhatsProt
             //use provided identity hash
             $this->identity = file_get_contents($identity.'.dat');
         }
+
         $this->name = $nickname;
         $this->loginStatus = static::DISCONNECTED_STATUS;
     }
@@ -154,18 +166,8 @@ class WhatsProt
             throw new Exception('The provided phone number is not valid.');
         }
 
-        if ($countryCode == null && $phone['ISO3166'] != '') {
-            $countryCode = $phone['ISO3166'];
-        }
-        if ($countryCode == null) {
-            $countryCode = 'US';
-        }
-        if ($langCode == null && $phone['ISO639'] != '') {
-            $langCode = $phone['ISO639'];
-        }
-        if ($langCode == null) {
-            $langCode = 'en';
-        }
+        $countryCode = $phone['ISO3166'];
+        $langCode    = $phone['ISO639'];
 
         // Build the url.
         $host = 'https://' . static::WHATSAPP_CHECK_HOST;
@@ -231,18 +233,8 @@ class WhatsProt
             throw new Exception('The provided phone number is not valid.');
         }
 
-        if ($countryCode == null && $phone['ISO3166'] != '') {
-            $countryCode = $phone['ISO3166'];
-        }
-        if ($countryCode == null) {
-            $countryCode = 'US';
-        }
-        if ($langCode == null && $phone['ISO639'] != '') {
-            $langCode = $phone['ISO639'];
-        }
-        if ($langCode == null) {
-            $langCode = 'en';
-        }
+        $countryCode = $phone['ISO3166'];
+        $langCode    = $phone['ISO639'];
 
         // Build the url.
         $host = 'https://' . static::WHATSAPP_REGISTER_HOST;
@@ -309,24 +301,14 @@ class WhatsProt
      *
      * @throws Exception
      */
-    public function codeRequest($method = 'sms', $countryCode = null, $langCode = null)
+    public function codeRequest($method = 'sms')
     {
         if (!$phone = $this->dissectPhone()) {
             throw new Exception('The provided phone number is not valid.');
         }
 
-        if ($countryCode == null && $phone['ISO3166'] != '') {
-            $countryCode = $phone['ISO3166'];
-        }
-        if ($countryCode == null) {
-            $countryCode = 'US';
-        }
-        if ($langCode == null && $phone['ISO639'] != '') {
-            $langCode = $phone['ISO639'];
-        }
-        if ($langCode == null) {
-            $langCode = 'en';
-        }
+        $countryCode = $phone['ISO3166'];
+        $langCode    = $phone['ISO639'];
 
         // Build the token.
         $token = generateRequestToken($phone['country'], $phone['phone']);
@@ -341,8 +323,8 @@ class WhatsProt
             'lg' => $langCode,
             'lc' => $countryCode,
             'token' => urlencode($token),
-            'sim_mcc' => '000', //$phone['mcc']
-            'sim_mnc' => '000', // 001
+            'sim_mcc' => $phone['mcc'],
+            'sim_mnc' => $phone['mnc'],
           //'reason' => 'jailbroken',
         );
 
@@ -408,9 +390,13 @@ class WhatsProt
         $WAver = trim(file_get_contents(static::WHATSAPP_VER_CHECKER));
 
         $WAverS = str_replace(".","",$WAver);
-        $ver = str_replace(".","",static::WHATSAPP_VER);
+        $ver = str_replace(".","",$this->whVersion);
 
-        if($ver>=$WAverS)
+        if (isset($this->cfgOverride['disable_auto_update']))
+        {
+            echo "\nAuto Update Disabled..\n\n";
+        }
+        else if($ver>=$WAverS)
         {
           echo "\nUp to date :)\n\n";
         }
@@ -1493,7 +1479,7 @@ class WhatsProt
         $this->inputKey = new KeyStream($keys[2], $keys[3]);
         $this->outputKey = new KeyStream($keys[0], $keys[1]);
         $phone = $this->dissectPhone();
-        $array = "\0\0\0\0" . $this->phoneNumber . $this->challengeData;// . time() . static::WHATSAPP_USER_AGENT . " MccMnc/" . str_pad($phone["mcc"], 3, "0", STR_PAD_LEFT) . "001";
+        $array = "\0\0\0\0" . $this->phoneNumber . $this->challengeData;// . time() . $this->whUserAgent . " MccMnc/" . str_pad($phone["mcc"], 3, "0", STR_PAD_LEFT) . "001";
         $response = $this->outputKey->EncodeMessage($array, 0, 4, strlen($array) - 4);
         return $response;
     }
@@ -1525,7 +1511,7 @@ class WhatsProt
             $this->reader->setKey($this->inputKey);
             //$this->writer->setKey($this->outputKey);
             $phone = $this->dissectPhone();
-            $array = "\0\0\0\0" . $this->phoneNumber . $this->challengeData . time() . static::WHATSAPP_USER_AGENT . " MccMnc/" . str_pad($phone["mcc"], 3, "0", STR_PAD_LEFT) . "001";
+            $array = "\0\0\0\0" . $this->phoneNumber . $this->challengeData . time() . $this->whUserAgent . " MccMnc/" . str_pad($phone["mcc"], 3, "0", STR_PAD_LEFT) . "001";
             $this->challengeData = null;
             return $this->outputKey->EncodeMessage($array, 0, strlen($array), false);
         }
@@ -1610,8 +1596,18 @@ class WhatsProt
                     // Return the first appearance.
                     fclose($handle);
 
-                    $mcc = explode("|", $data[2]);
-                    $mcc = $mcc[0];
+                    $mcc         = explode("|", $data[2])[0];
+                    $mnc         = '000';
+                    $countryCode = "US";
+                    $langCode    = "en";
+
+                    $c = $this->cfgOverride;
+
+                    if (isset($c['phone_mcc'])) { $mcc = $c['phone_mcc']; }
+                    if (isset($c['phone_mnc'])) { $mnc = $c['phone_mnc']; }
+
+                    if (isset($c['phone_country_code']  )) { $countryCode = $c['phone_country_code']; }
+                    if (isset($c['phone_language_code'] )) { $langCode    = $c['phone_language_code'];}
 
                     //hook:
                     //fix country code for North America
@@ -1622,11 +1618,12 @@ class WhatsProt
 
                     $phone = array(
                         'country' => $data[0],
-                        'cc' => $data[1],
-                        'phone' => substr($this->phoneNumber, strlen($data[1]), strlen($this->phoneNumber)),
-                        'mcc' => $mcc,
-                        'ISO3166' => @$data[3],
-                        'ISO639' => @$data[4]
+                        'cc'      => $data[1],
+                        'phone'   => substr($this->phoneNumber, strlen($data[1]), strlen($this->phoneNumber)),
+                        'mcc'     => $mcc,
+                        'mnc'     => $mnc,
+                        'ISO3166' => $countryCode,
+                        'ISO639'  => $langCode
                     );
 
                     $this->eventManager()->fireDissectPhone(
@@ -1664,7 +1661,7 @@ class WhatsProt
     {
         $this->writer->resetKey();
         $this->reader->resetKey();
-        $resource = static::WHATSAPP_DEVICE . '-' . static::WHATSAPP_VER . '-' . static::PORT;
+        $resource = $this->whDevice . '-' . $this->whVersion . '-' . static::PORT;
         $data = $this->writer->StartStream(static::WHATSAPP_SERVER, $resource);
         $feat = $this->createFeaturesNode();
         $auth = $this->createAuthNode();
@@ -1892,7 +1889,7 @@ class WhatsProt
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_USERAGENT, static::WHATSAPP_USER_AGENT);
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->whUserAgent);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: text/json'));
         // This makes CURL accept any peer!
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -3088,5 +3085,21 @@ class WhatsProt
         $parts = explode('@', $jid);
         $parts = reset($parts);
         return $parts;
+    }
+
+    /**
+     * @param $cfg
+     */
+    private function applyConfigurationOverridesWith($cfg)
+    {
+        $this->whUserAgent = static::WHATSAPP_USER_AGENT;
+        $this->whVersion   = static::WHATSAPP_VER;
+        $this->whDevice    = static::WHATSAPP_DEVICE;
+
+        if (isset($cfg['wh_version']   )) { $this->whVersion   = $cfg['wh_version'];    }
+        if (isset($cfg['wh_device']    )) { $this->whDevice    = $cfg['wh_device'];     }
+        if (isset($cfg['wh_user_agent'])) { $this->whUserAgent = $cfg['wh_user_agent']; }
+
+        $this->cfgOverride = $cfg;
     }
 }

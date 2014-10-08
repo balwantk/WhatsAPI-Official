@@ -1,0 +1,11 @@
+phone_mcc:           '405'
+phone_mnc:           '911'
+
+phone_country_code:  'IN'
+phone_language_code: 'en'
+
+wh_version:          '2.11.407'
+wh_device:           'Android'
+wh_user_agent:       'WhatsApp/2.11.407 Android/4.3 Device/GalaxyS3'
+
+app_time_zone:       'Asia/Kolkata'

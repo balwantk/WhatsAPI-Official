@@ -1495,6 +1495,7 @@ class WhatsProt
         $authHash = array();
         $authHash["xmlns"] = "urn:ietf:params:xml:ns:xmpp-sasl";
         $authHash["mechanism"] = "WAUTH-2";
+//        $authHash["user"] = $this->phoneNumber;
         $authHash["user"] = $this->phoneNumber;
         $data = $this->createAuthBlob();
         $node = new ProtocolNode("auth", $authHash, null, $data);
@@ -1596,7 +1597,8 @@ class WhatsProt
                     // Return the first appearance.
                     fclose($handle);
 
-                    $mcc         = explode("|", $data[2])[0];
+                    $mcc         = explode("|", $data[2]);
+                    $mcc         = $mcc[0];
                     $mnc         = '000';
                     $countryCode = "US";
                     $langCode    = "en";
@@ -1681,7 +1683,7 @@ class WhatsProt
             $this->pollMessage();
         }
 
-        if(strcmp($this->loginStatus, static::DISCONNECTED_STATUS) == 0)
+        if(strcmp($this->loginStaupdateDatatus, static::DISCONNECTED_STATUS) == 0)
 		{
 			throw new Exception('Login Failure');
 		}

@@ -5,10 +5,10 @@
  */
 
 
-interface WhatsAppEventListener {   
-    function onClose( 
+interface WhatsAppEventListener {
+    function onClose(
         $phone, // The user phone number including the country code.
-        $error  // The error message. 
+        $error  // The error message.
     );
 
     function onCodeRegister(
@@ -23,34 +23,34 @@ interface WhatsAppEventListener {
         $currency, // Currency price of account.
         $price_expiration // Price expiration in UNIX TimeStamp.
     );
-    
+
     function onCodeRegisterFailed(
         $phone, // The user phone number including the country code.
         $status, // The server status number
         $reason, // Reason of the status (e.g. too_recent/missing_param/bad_param).
         $retry_after// Waiting time before requesting a new code in seconds.
     );
-    
+
     function onCodeRequest(
         $phone, // The user phone number including the country code.
         $method, // Used method (SMS/voice).
         $length// Registration code length.
     );
-    
+
     function onCodeRequestFailed(
         $phone, // The user phone number including the country code.
         $method, // Used method (SMS/voice).
         $reason, // Reason of the status (e.g. too_recent/missing_param/bad_param).
         $value// The missing_param/bad_param or waiting time before requesting a new code.
     );
-    
+
    function onCodeRequestFailedTooRecent(
         $phone, // The user phone number including the country code.
         $method, // Used method (SMS/voice).
         $reason, // Reason of the status (too_recent).
         $retry_after // Waiting time before requesting a new code in seconds.
     );
-    
+
    function onConnect(
         $phone, // The user phone number including the country code.
         $socket // The resource socket id.
@@ -154,7 +154,8 @@ interface WhatsAppEventListener {
         $filehash, // The image file hash.
         $width, // The image width.
         $height, // The image height.
-        $thumbnail // The base64_encode image thumbnail.
+        $thumbnail, // The base64_encode image thumbnail.
+        $caption // The image caption.
     );
 
     function onGetLocation(
@@ -191,13 +192,13 @@ interface WhatsAppEventListener {
         $name, // The sender name.
         $message // The message.
     );
-    
+
     function onGetGroupParticipants(
         $phone,
         $groupId,
-        $groupList            
+        $groupList
     );
-    
+
     function onGetPrivacyBlockedList(
         $phone, // The user phone number including the country code.
         $children
@@ -217,7 +218,7 @@ interface WhatsAppEventListener {
         $type, // The type of picture (image/preview).
         $thumbnail// The base64_encoded image.
     );
-    
+
     function onGetRequestLastSeen(
         $phone, // The user phone number including the country code.
         $from, // The sender JID.
@@ -230,7 +231,7 @@ interface WhatsAppEventListener {
         $version, // The version number on the server.
         $properties // Array of server properties.
     );
-    
+
     function onGetStatus(
         $phone,
         $from,
@@ -239,7 +240,7 @@ interface WhatsAppEventListener {
         $t,
         $status
     );
-    
+
     function onGetvCard(
         $phone, // The user phone number including the country code.
         $from, // The sender JID.
@@ -266,12 +267,20 @@ interface WhatsAppEventListener {
         $duration, // The video duration.
         $vcodec, // The video codec.
         $acodec, // The audio codec.
-        $thumbnail // The base64_encode video thumbnail.
+        $thumbnail, // The base64_encode video thumbnail.
+		$caption // The video caption.
     );
 
     function onGroupsChatCreate(
         $phone, // The user phone number including the country code.
         $gId // The group JID.
+    );
+
+    function onGroupsChatisCreated(
+        $phone,
+        $creator,
+        $gId,
+        $subject
     );
 
     function onGroupsChatEnd(
@@ -288,14 +297,13 @@ interface WhatsAppEventListener {
     function onGroupsParticipantsRemove(
         $phone, // The user phone number including the country code.
         $groupId, // The group JID.
-        $participant, // The participant JID.
-        $author // The author JID.
+        $participant // The participant JID.
     );
 
     function onLogin(
         $phone // The user phone number including the country code.
     );
-    
+
     function onLoginFailed(
         $phone, // The user phone number including the country code.
         $tag
@@ -310,17 +318,18 @@ interface WhatsAppEventListener {
         $filename,
         $filesize,
         $filehash,
-        $icon        
+	$caption,
+        $icon
     );
-    
+
     function onMediaUploadFailed(
         $phone, // The user phone number including the country code.
         $id,
-        $node,  
+        $node,
         $messageNode,
         $reason
     );
-   
+
     function onMessageComposing(
         $phone, // The user phone number including the country code.
         $from, // The sender JID.
@@ -349,7 +358,17 @@ interface WhatsAppEventListener {
         $phone, // The user phone number including the country code.
         $from, // The sender JID.
         $msgid, // The message id.
-        $type // The message type.
+        $type, // The message type.
+        $time // The unix time when send message notification.
+    );
+
+    function onPaidAccount(
+        $phone,
+        $author,
+        $kind,
+        $status,
+        $creation,
+        $expiration
     );
 
     function onPing(
@@ -364,24 +383,24 @@ interface WhatsAppEventListener {
     );
 
     function onProfilePictureChanged(
-        $phone, 
+        $phone,
         $from,
         $id,
-        $t            
+        $t
     );
 
     function onProfilePictureDeleted(
-        $phone, 
+        $phone,
         $from,
         $id,
-        $t            
+        $t
     );
-    
+
     function onSendMessage(
         $phone, // The user phone number including the country code.
         $targets,
         $id,
-        $node 
+        $node
     );
 
     function onSendMessageReceived(
@@ -406,16 +425,16 @@ interface WhatsAppEventListener {
         $phone, // The user phone number including the country code.
         $msg  // The status message.
     );
-    
+
     function onUploadFile(
         $phone, // The user phone number including the country code.
-        $name, // The filename.       
+        $name, // The filename.
         $url  // The remote url on WhatsApp servers (note, // this is NOT the URL to download the file, only used for sending message).
     );
 
     function onUploadFileFailed(
         $phone, // The user phone number including the country code.
-        $name // The filename.     
+        $name // The filename.
     );
 
     /**

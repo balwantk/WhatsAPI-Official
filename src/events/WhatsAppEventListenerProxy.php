@@ -10,135 +10,135 @@
 abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
     /**
      *  This method will get all event calls.
-     * 
+     *
      */
     abstract protected function handleEvent($eventName, array $arguments );
 
-    function onClose( 
-        $phone, 
-        $error  
+    function onClose(
+        $phone,
+        $error
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     function onCodeRegister(
-        $phone,  
-        $login,  
-        $pw,     
-        $type,   
-        $expiration,  
-        $kind,   
-        $price,  
-        $cost,   
-        $currency,  
-        $price_expiration  
-    ) {
-        $this->handleEvent(__FUNCTION__, func_get_args());      
-    }
-    
-    function onCodeRegisterFailed(
-        $phone,  
-        $status,  
-        $reason,  
-        $retry_after 
+        $phone,
+        $login,
+        $pw,
+        $type,
+        $expiration,
+        $kind,
+        $price,
+        $cost,
+        $currency,
+        $price_expiration
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
-    
+
+    function onCodeRegisterFailed(
+        $phone,
+        $status,
+        $reason,
+        $retry_after
+    ) {
+        $this->handleEvent(__FUNCTION__, func_get_args());
+    }
+
     function onCodeRequest(
-        $phone, 
+        $phone,
         $method,
         $length
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
-    
+
     function onCodeRequestFailed(
-        $phone, 
-        $method, 
-        $reason, 
+        $phone,
+        $method,
+        $reason,
         $value
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
-    
+
    function onCodeRequestFailedTooRecent(
-        $phone, 
-        $method, 
-        $reason, 
-        $retry_after 
+        $phone,
+        $method,
+        $reason,
+        $retry_after
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
-    
+
    function onConnect(
-        $phone, 
-        $socket 
+        $phone,
+        $socket
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     function onCredentialsBad(
-        $phone, 
-        $status, 
-        $reason 
+        $phone,
+        $status,
+        $reason
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     function onCredentialsGood(
-        $phone, 
-        $login, 
-        $pw, 
-        $type, 
-        $expiration, 
-        $kind, 
-        $price, 
-        $cost, 
-        $currency, 
-        $price_expiration 
+        $phone,
+        $login,
+        $pw,
+        $type,
+        $expiration,
+        $kind,
+        $price,
+        $cost,
+        $currency,
+        $price_expiration
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     function onDisconnect(
-        $phone, 
-        $socket 
+        $phone,
+        $socket
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     function onDissectPhone(
-        $phone, 
-        $country, 
-        $cc, 
-        $mcc, 
-        $lc, 
-        $lg 
+        $phone,
+        $country,
+        $cc,
+        $mcc,
+        $lc,
+        $lg
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     function onDissectPhoneFailed(
-        $phone 
+        $phone
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     function onGetAudio(
-        $phone, 
-        $from, 
-        $msgid, 
-        $type, 
-        $time, 
-        $name, 
-        $size, 
-        $url, 
-        $file, 
+        $phone,
+        $from,
+        $msgid,
+        $type,
+        $time,
+        $name,
+        $size,
+        $url,
+        $file,
         $mimetype,
         $filehash,
         $duration,
-        $acodec 
+        $acodec
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
@@ -146,7 +146,7 @@ abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
     function onGetError(
         $phone,
         $id,
-        $error 
+        $error
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
@@ -159,15 +159,15 @@ abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
     }
 
     function onGetGroupsInfo(
-        $phone, 
+        $phone,
         $groupList
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     function onGetGroupsSubject(
-        $phone, 
-        $gId, 
+        $phone,
+        $gId,
         $time,
         $author,
         $participant,
@@ -191,7 +191,8 @@ abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
         $filehash,
         $width,
         $height,
-        $thumbnail
+        $thumbnail,
+        $caption
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
@@ -244,7 +245,7 @@ abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
         $children
             /*
         $data,
-        $onGetProfilePicture, 
+        $onGetProfilePicture,
         $phone,
         $from,
         $type,
@@ -262,7 +263,7 @@ abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
-    
+
     function onGetRequestLastSeen(
         $phone,
         $from,
@@ -308,7 +309,8 @@ abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
         $duration,
         $vcodec,
         $acodec,
-        $thumbnail
+        $thumbnail,
+        $caption
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
@@ -318,6 +320,15 @@ abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
         $gId
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
+    }
+
+    function onGroupsChatisCreated(
+        $phone,
+        $creator,
+        $gId,
+        $subject
+    ) {
+    $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     function onGroupsChatEnd(
@@ -338,8 +349,7 @@ abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
     function onGroupsParticipantsRemove(
         $phone,
         $groupId,
-        $participant,
-        $author
+        $participant
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
@@ -384,7 +394,19 @@ abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
         $phone,
         $from,
         $msgid,
-        $type
+        $type,
+        $time
+    ) {
+        $this->handleEvent(__FUNCTION__, func_get_args());
+    }
+
+    function onPaidAccount(
+        $phone,
+        $author,
+        $kind,
+        $status,
+        $creation,
+        $expiration
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
@@ -434,7 +456,7 @@ abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
-    
+
     function onUploadFile(
         $phone,
         $name,
@@ -451,84 +473,85 @@ abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
     }
 
     public function onConnectError(
-        $phone, 
+        $phone,
         $socket
     ) {
-        $this->handleEvent(__FUNCTION__, func_get_args()); 
+        $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     public function onGetGroupParticipants(
-        $phone, 
-        $groupId, 
+        $phone,
+        $groupId,
         $groupList
     ) {
-        $this->handleEvent(__FUNCTION__, func_get_args()); 
+        $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     public function onGetStatus(
-        $phone, 
-        $from, 
-        $type, 
-        $id, 
-        $t, 
+        $phone,
+        $from,
+        $type,
+        $id,
+        $t,
         $status
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     public function onLoginFailed(
-        $phone, 
+        $phone,
         $tag
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     public function onMediaMessageSent(
-        $phone, 
-        $to, 
-        $id, 
-        $filetype, 
-        $url, 
-        $filename, 
+        $phone,
+        $to,
+        $id,
+        $filetype,
+        $url,
+        $filename,
         $filesize,
         $filehash,
+	$caption,
         $icon
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     public function onMediaUploadFailed(
-        $phone, 
-        $id, 
-        $node, 
-        $messageNode, 
+        $phone,
+        $id,
+        $node,
+        $messageNode,
         $reason
-    ) {      
+    ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     public function onProfilePictureChanged(
-        $phone, 
-        $from, 
-        $id, 
+        $phone,
+        $from,
+        $id,
         $t
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     public function onProfilePictureDeleted(
-        $phone, 
-        $from, 
-        $id, 
+        $phone,
+        $from,
+        $id,
         $t
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }
 
     public function onSendMessage(
-        $phone, 
-        $targets, 
-        $id, 
+        $phone,
+        $targets,
+        $id,
         $node
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());

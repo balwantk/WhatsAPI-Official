@@ -2872,6 +2872,7 @@ class WhatsProt
      * Send a broadcast
      * @param  array $targets Array of numbers to send to
      * @param  object $node
+     * @return string
      */
     protected function sendBroadcast($targets, $node, $type)
     {

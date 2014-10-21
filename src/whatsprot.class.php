@@ -158,6 +158,30 @@ class WhatsProt
         $this->loginStatus = static::DISCONNECTED_STATUS;
     }
 
+
+    /**
+     * Used of override hard coded values.
+     *
+     * @param $cfg
+     */
+    public function applyConfigurationOverridesWith($cfg)
+    {
+        $this->whUserAgent = static::WHATSAPP_USER_AGENT;
+        $this->whVersion   = static::WHATSAPP_VER;
+        $this->whDevice    = static::WHATSAPP_DEVICE;
+
+        if (isset($cfg['wh_version']   ))     { $this->whVersion      = $cfg['wh_version'];        }
+        if (isset($cfg['wh_device']    ))     { $this->whDevice       = $cfg['wh_device'];         }
+        if (isset($cfg['wh_user_agent']))     { $this->whUserAgent    = $cfg['wh_user_agent'];     }
+
+        if (isset($cfg['wh_md5']))            { $this->classesMd5     = $cfg['wh_md5'];            }
+        if (isset($cfg['wh_password']))       { $this->password       = $cfg['wh_password'];       }
+        if (isset($cfg['wh_challenge_file'])) { $this->setChallengeName($cfg['wh_challenge_file']);}
+
+        $this->cfgOverride = $cfg;
+    }
+
+
     /**
      * If you need use different challenge fileName you can use this
      *
@@ -3162,21 +3186,5 @@ class WhatsProt
         $parts = explode('@', $jid);
         $parts = reset($parts);
         return $parts;
-    }
-
-    /**
-     * @param $cfg
-     */
-    private function applyConfigurationOverridesWith($cfg)
-    {
-        $this->whUserAgent = static::WHATSAPP_USER_AGENT;
-        $this->whVersion   = static::WHATSAPP_VER;
-        $this->whDevice    = static::WHATSAPP_DEVICE;
-
-        if (isset($cfg['wh_version']   )) { $this->whVersion   = $cfg['wh_version'];    }
-        if (isset($cfg['wh_device']    )) { $this->whDevice    = $cfg['wh_device'];     }
-        if (isset($cfg['wh_user_agent'])) { $this->whUserAgent = $cfg['wh_user_agent']; }
-
-        $this->cfgOverride = $cfg;
     }
 }

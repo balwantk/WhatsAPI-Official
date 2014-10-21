@@ -444,14 +444,24 @@ class WhatsProt
     public function connect()
     {
 
-        $WAver = trim(file_get_contents(static::WHATSAPP_VER_CHECKER));
-
+        $WAver  = trim(file_get_contents(static::WHATSAPP_VER_CHECKER));
         $WAverS = str_replace(".","",$WAver);
-        $ver = str_replace(".","",$this->whVersion);
+        $ver    = str_replace(".","",$this->whVersion);
 
         if (isset($this->cfgOverride['disable_auto_update']))
         {
-            echo "\nAuto Update Disabled..\n\n";
+            echo "\nAuto Update Disabled..\n";
+            echo "CURRENT Version is " . $this->whVersion;
+
+            if($ver>=$WAverS)
+            {
+                echo "\nIt is up to date :)\n\n";
+            }
+            else{
+                $classesMD5 = file_get_contents('https://coderus.openrepos.net/whitesoft/whatsapp_classes');
+                echo "Consider updating to: ".$WAver."\n";
+                echo "Md5 is: ".$classesMD5."\n\n";
+            }
         }
         else if($ver>=$WAverS)
         {

@@ -8,6 +8,12 @@ require_once 'mediauploader.php';
 require_once 'keystream.class.php';
 require_once 'tokenmap.class.php';
 
+set_include_path(dirname(dirname(__FILE__)));
+require_once 'vendor/autoload.php';
+
+use Symfony\Component\Yaml\Parser;
+
+
 class SyncResult
 {
     public $index;
@@ -85,6 +91,31 @@ class WhatsProt
     protected $whDevice;                // Device as configured (static/override)
     protected $whVersion;               // Whatsapp version as configured (static/override)
     protected $whUserAgent;             // User Agent version as configured (static/override)
+
+    /**
+     * Factory for creating a WhatsProt class from config array.
+     * @param $config_path
+     *   is the path to the yaml config file.
+     * @internal param array $config Override hardcoded parameters with YAML ones.
+     * @return \WhatsProt
+     */
+    public static function constructWithConfig($config_path) {
+        $yaml     = new Parser();
+        $config   = $yaml->parse(file_get_contents($config_path));
+
+        if (isset($config["app_time_zone"])) {
+            date_default_timezone_set($config["app_time_zone"]);
+        }
+
+        $username = $config["phone_number"];    // Telephone number including the country code without '+' or '00'.
+        $identity = $config["wh_identity"];     // Obtained during registration with this API or using MissVenom (https://github.com/shirioko/MissVenom) to sniff from your phone.
+        $nickname = $config["wh_nickname"];     // This is the username (or nickname) displayed by WhatsApp clients.
+        $debug    = $config["wh_debug"];        // Set this to true, to see debug mode.
+
+        $w = new WhatsProt($username, $identity, $nickname, $debug, $config);
+
+        return $w;
+    }
 
     /**
      * Default class constructor.
@@ -312,7 +343,7 @@ class WhatsProt
         $langCode    = $phone['ISO639'];
 
         // Build the token.
-        $token = generateRequestToken($phone['country'], $phone['phone']);
+        $token = generateRequestToken($phone['country'], $phone['phone'], $this->$classesMd5);
 
         // Build the url.
         $host = 'https://' . static::WHATSAPP_REQUEST_HOST;

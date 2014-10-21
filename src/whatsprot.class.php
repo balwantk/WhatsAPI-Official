@@ -1690,7 +1690,7 @@ class WhatsProt
             $this->pollMessage();
         }
 
-        if(strcmp($this->loginStaupdateDatatus, static::DISCONNECTED_STATUS) == 0)
+        if(strcmp($this->loginStatus, static::DISCONNECTED_STATUS) == 0)
 		{
 			throw new Exception('Login Failure');
 		}

@@ -322,10 +322,6 @@ class WhatsProt
      *
      * @param string $method
      *   Accepts only 'sms' or 'voice' as a value.
-     * @param string $countryCode
-     *   ISO Country Code, 2 Digit.
-     * @param string $langCode
-     *   ISO 639-1 Language Code: two-letter codes.
      *
      * @return object
      *   An object with server response.

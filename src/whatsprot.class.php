@@ -568,6 +568,24 @@ class WhatsProt
     }
 
     /**
+     * Login to the Whatsapp server with your password loaded from yaml configuration
+     *
+     */
+    public function loginWithConfiguredPassword()
+    {
+        if(isset($this->password)) {
+            if(is_readable($this->challengeFilename)) {
+                $challengeData = file_get_contents($this->challengeFilename);
+                if($challengeData)
+                    $this->challengeData = $challengeData;
+            }
+            $this->doLogin();
+        } else {
+            echo "PASSWORD NOT SET IN CONFIG!";
+        }
+    }
+
+    /**
      * Fetch a single message node
      * @param bool $autoReceipt
      * @return bool

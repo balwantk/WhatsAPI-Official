@@ -144,7 +144,9 @@ class WhatsProt
 
         $this->applyConfigurationOverridesWith($cfg);
 
-        if (!$this->checkIdentity($identity)) {
+        if (isset($this->cfgOverride['wh_identity'])) {
+            $this->identity = $this->cfgOverride['wh_identity'];
+        } else if (!$this->checkIdentity($identity)) {
             //compute identity with pseudo_random_bytes
             $this->identity = $this->buildIdentity($identity);
         } else {

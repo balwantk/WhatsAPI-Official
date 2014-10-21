@@ -123,7 +123,7 @@ class WhatsProt
     }
 
     /**
-     * If you need use diferent challenge fileName you can use this
+     * If you need use different challenge fileName you can use this
      *
      * @param string $filename
      */
@@ -1664,12 +1664,7 @@ class WhatsProt
     }
 
     /**
-     * Send the nodes to the Whatsapp server to log in.
-     *
-     * @param  bool $profileSubscribe
-     * Set this to true if you would like Whatsapp to send a
-     * notification to your phone when one of your contacts
-     * changes/update their picture.
+     * Send the nodes to the Whatsapp server to log in
      */
     protected function doLogin()
     {

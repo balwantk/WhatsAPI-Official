@@ -61,8 +61,11 @@ class WhatsProt
     /**
      * Property declarations.
      */
-    protected $accountInfo;             // The AccountInfo object.
+
     protected $challengeFilename = 'nextChallenge.dat';
+    protected $classesMd5        = "Vu6nzOKzMttaMOYKo7YkEw=="; // 2.11.419
+
+    protected $accountInfo;             // The AccountInfo object.
     protected $challengeData;           //
     protected $debug;                   // Determines whether debug mode is on or off.
     protected $event;                   // An instance of the WhatsAppEvent class.

@@ -17,3 +17,6 @@ wh_code_request_method: 'sms'
 
 app_time_zone:          'Asia/Kolkata'
 disable_auto_update:    'true'
+
+# TODO: Upon successful registration, we can append wh_identity and wh_password to the file, hence completing the config.
+# TODO: Status message, and display pic (via URL) can be set from here.

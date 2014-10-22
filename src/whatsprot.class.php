@@ -109,7 +109,7 @@ class WhatsProt
         if (isset($config["wh_identity"])) {
             $identity = $config["wh_identity"]; // Obtained during registration with this API or using MissVenom (https://github.com/shirioko/MissVenom) to sniff from your phone.
         } else {
-            $identity = "";
+            $identity = $username;
         }
 
         $w = new WhatsProt($username, $identity, $nickname, $debug, $config);

@@ -15,6 +15,7 @@ wh_user_agent:       'WhatsApp/2.11.419 Android/4.3 Device/GalaxyS3'
 
 wh_challenge_file:   'nextChallenge.dat'
 wh_debug:            'true'
+wh_code_mode:        'sms'
 
 app_time_zone:       'Asia/Kolkata'
 disable_auto_update: 'true'

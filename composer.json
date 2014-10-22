@@ -1,5 +1,13 @@
 {
+    "repositories": [
+        {
+            "type": "pear",
+            "url": "http://pear.php.net"
+        }
+    ],
+
     "require": {
-        "symfony/yaml": "2.5.*"
+        "symfony/yaml": "2.5.*",
+        "pear-pear.php.net/HTTP_Request2": "2.2.1"
     }
 }

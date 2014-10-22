@@ -103,9 +103,14 @@ class WhatsProt
         }
 
         $username = $config["phone_number"];    // Telephone number including the country code without '+' or '00'.
-        $identity = $config["wh_identity"];     // Obtained during registration with this API or using MissVenom (https://github.com/shirioko/MissVenom) to sniff from your phone.
         $nickname = $config["wh_nickname"];     // This is the username (or nickname) displayed by WhatsApp clients.
         $debug    = $config["wh_debug"];        // Set this to true, to see debug mode.
+
+        if (isset($config["wh_identity"])) {
+            $identity = $config["wh_identity"]; // Obtained during registration with this API or using MissVenom (https://github.com/shirioko/MissVenom) to sniff from your phone.
+        } else {
+            $identity = "";
+        }
 
         $w = new WhatsProt($username, $identity, $nickname, $debug, $config);
 

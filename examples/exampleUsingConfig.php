@@ -28,4 +28,4 @@ $w->connect();
 $w->loginWithConfiguredPassword();
 $w->sendMessage($target, "Config file works!");
 
-// php examples/exampleUsingConfig.php --config='examples/sample_config.yaml'
+// php examples/exampleUsingConfig.php --config='examples/sample_full_config.yaml'

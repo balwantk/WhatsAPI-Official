@@ -1,5 +1,5 @@
-phone_mcc:              '000'
-phone_mnc:              '000'
+phone_mcc:              '000' # Refer to below sites to get the most accurate data for your SIM.
+phone_mnc:              '000' # http://www.mcc-mnc.com/ AND http://en.wikipedia.org/wiki/Mobile_country_code
 phone_country_code:     'US'
 phone_language_code:    'en'
 phone_number:           '919822012345' # With country code without + or 00

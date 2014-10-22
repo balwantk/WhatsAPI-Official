@@ -8,11 +8,6 @@ require_once 'mediauploader.php';
 require_once 'keystream.class.php';
 require_once 'tokenmap.class.php';
 
-set_include_path(dirname(dirname(__FILE__)));
-require_once 'vendor/autoload.php';
-
-use Symfony\Component\Yaml\Parser;
-
 
 class SyncResult
 {
@@ -97,14 +92,11 @@ class WhatsProt
 
     /**
      * Factory for creating a WhatsProt class from config array.
-     * @param $config_path
-     *   is the path to the yaml config file.
+     * @param $config
      * @internal param array $config Override hardcoded parameters with YAML ones.
      * @return \WhatsProt
      */
-    public static function constructWithConfig($config_path) {
-        $yaml     = new Parser();
-        $config   = $yaml->parse(file_get_contents($config_path));
+    public static function constructWithConfig($config) {
 
         if (isset($config["app_time_zone"])) {
             date_default_timezone_set($config["app_time_zone"]);

@@ -357,6 +357,10 @@ class WhatsProt
      */
     public function codeRequest($method = 'sms')
     {
+        if (isset($this->cfgOverride['wh_code_request_method'])) {
+            $method = $this->cfgOverride['wh_code_request_method'];
+        }
+
         if (!$phone = $this->dissectPhone()) {
             throw new Exception('The provided phone number is not valid.');
         }

@@ -10,10 +10,9 @@ wh_version:             '2.11.419'
 wh_device:              'Android'
 wh_user_agent:          'WhatsApp/2.11.419 Android/4.3 Device/GalaxyS3'
 
-wh_challenge_file:      'nextChallenge.dat'
+wh_challenge_file:      'nextChallenge.dat' # This can be renamed to something more specific to the phone number like 919822012345Chal.dat
 wh_debug:               'true'
 wh_code_request_method: 'sms'
-
 
 app_time_zone:          'Asia/Kolkata'
 disable_auto_update:    'true'

@@ -1,18 +1,19 @@
-phone_mcc:           '000'
-phone_mnc:           '000'
-phone_country_code:  'US'
-phone_language_code: 'en'
-phone_number:        '919822012345' # With country code without + or 00
-wh_nickname:         'Vader'
+phone_mcc:              '000'
+phone_mnc:              '000'
+phone_country_code:     'US'
+phone_language_code:    'en'
+phone_number:           '919822012345' # With country code without + or 00
+wh_nickname:            'Vader'
 
-wh_md5:              'Vu6nzOKzMttaMOYKo7YkEw=='
-wh_version:          '2.11.419'
-wh_device:           'Android'
-wh_user_agent:       'WhatsApp/2.11.419 Android/4.3 Device/GalaxyS3'
+wh_md5:                 'Vu6nzOKzMttaMOYKo7YkEw=='
+wh_version:             '2.11.419'
+wh_device:              'Android'
+wh_user_agent:          'WhatsApp/2.11.419 Android/4.3 Device/GalaxyS3'
 
-wh_challenge_file:   'nextChallenge.dat'
-wh_debug:            'true'
-wh_code_mode:        'sms'
+wh_challenge_file:      'nextChallenge.dat'
+wh_debug:               'true'
+wh_code_request_method: 'sms'
 
-app_time_zone:       'Asia/Kolkata'
-disable_auto_update: 'true'
+
+app_time_zone:          'Asia/Kolkata'
+disable_auto_update:    'true'

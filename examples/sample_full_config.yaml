@@ -1,22 +1,22 @@
-phone_mcc:           '000'
-phone_mnc:           '000'
-phone_country_code:  'US'
-phone_language_code: 'en'
-phone_number:        'your_phone_number_here' # With country code without + or 00
+phone_mcc:              '000'
+phone_mnc:              '000'
+phone_country_code:     'US'
+phone_language_code:    'en'
+phone_number:           'your_phone_number_here' # With country code without + or 00
 
-wh_identity:         'your_whatsapp_identity_here'
-wh_password:         'your_whatsapp_password_here'
-wh_nickname:         'your_whatsapp_nickname_here'
+wh_identity:            'your_whatsapp_identity_here'
+wh_password:            'your_whatsapp_password_here'
+wh_nickname:            'your_whatsapp_nickname_here'
 
-wh_md5:              'Vu6nzOKzMttaMOYKo7YkEw=='
-wh_version:          '2.11.419'
-wh_device:           'Android'
-wh_user_agent:       'WhatsApp/2.11.419 Android/4.3 Device/GalaxyS3'
+wh_md5:                 'Vu6nzOKzMttaMOYKo7YkEw=='
+wh_version:             '2.11.419'
+wh_device:              'Android'
+wh_user_agent:          'WhatsApp/2.11.419 Android/4.3 Device/GalaxyS3'
 
-wh_challenge_file:   'nextChallenge.dat'
-wh_debug:            'true'
-wh_code_mode:        'sms'
+wh_challenge_file:      'nextChallenge.dat'
+wh_debug:               'true'
+wh_code_request_method: 'sms'
 
-app_time_zone:       'Asia/Kolkata'
-disable_auto_update: 'true'
+app_time_zone:          'Asia/Kolkata'
+disable_auto_update:    'true'
 

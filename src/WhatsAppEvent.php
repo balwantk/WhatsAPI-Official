@@ -61,7 +61,7 @@ class WhatsAppEvent
      *
      * @param string $event
      *   Name of the event.
-     * @param string $callback
+     * @param string $listener
      *   The method or function to call.
      *
      * @deprecated Use addEventListener instead.

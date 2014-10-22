@@ -1,4 +1,5 @@
 .idea/
 vendor/
 configs/
+apps/
 *.dat

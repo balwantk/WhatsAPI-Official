@@ -369,7 +369,7 @@ class WhatsProt
         $langCode    = $phone['ISO639'];
 
         // Build the token.
-        $token = generateRequestToken($phone['country'], $phone['phone'], $this->$classesMd5);
+        $token = generateRequestToken($phone['country'], $phone['phone'], $this->classesMd5);
 
         // Build the url.
         $host = 'https://' . static::WHATSAPP_REQUEST_HOST;

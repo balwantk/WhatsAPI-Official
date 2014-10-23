@@ -452,7 +452,7 @@ class WhatsProt
         if (isset($this->cfgOverride['disable_auto_update']))
         {
             echo "\nAuto Update Disabled..\n";
-            echo "CURRENT Version is " . $this->whVersion;
+            echo "\nCURRENT Version is " . $this->whVersion."\n";
 
             if($ver>=$WAverS)
             {
@@ -460,8 +460,7 @@ class WhatsProt
             }
             else{
                 $classesMD5 = file_get_contents('https://coderus.openrepos.net/whitesoft/whatsapp_classes');
-                echo "Consider updating to: ".$WAver."\n";
-                echo "Md5 is: ".$classesMD5."\n\n";
+                echo "\nConsider updating to: ".$WAver." It's Md5 is: ".$classesMD5."\n\n";
             }
         }
         else if($ver>=$WAverS)

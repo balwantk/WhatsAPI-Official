@@ -2539,9 +2539,12 @@ class WhatsProt
         $children = $node->getChild(0);
         if ($node->getTag() == "stream:error" && empty($children) == false && $node->getChild(0)->getTag() == "system-shutdown")
         {
-
             throw new Exception('Error system-shutdown');
 
+        }
+        else if ($node->getTag() == "stream:error" && empty($children) == false)
+        {
+            throw new Exception('Error stream error');
         }
 
         if($node->getTag() == "notification")

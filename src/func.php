@@ -169,18 +169,18 @@ function ArrayEmojis(){
 
 function updateData($nameFile, $WAver, $classesMD5 = "")
 {
-	$file = $nameFile;
+	$file = __DIR__."/".$nameFile;
 	$open = fopen($file, 'r+');
 	$content = fread($open,filesize($file));
 	fclose($open);
 
 	$content = explode("\n",$content);
 
-	if ($file == 'token.php')
-		$content[5] = '  $classesMd5 = '."\"".$classesMD5."\"; // $WAver";
-	else if ($file == 'whatsprot.class.php'){
-		$content[48] = '    const WHATSAPP_VER = \''.$WAver. '\';                // The WhatsApp version.';
-		$content[49] = '    const WHATSAPP_USER_AGENT = \'WhatsApp/'.$WAver.' Android/4.3 Device/GalaxyS3\'; // User agent used in request/registration code.';
+	if ($file == __DIR__.'/token.php')
+		$content[5] = '  $classesMd5 = '."\"".trim($classesMD5)."\"; // $WAver";
+	else if ($file == __DIR__.'/whatsprot.class.php'){
+		$content[48] = '    const WHATSAPP_VER = \''.trim($WAver). '\';                // The WhatsApp version.';
+		$content[49] = '    const WHATSAPP_USER_AGENT = \'WhatsApp/'.trim($WAver).' Android/4.3 Device/GalaxyS3\'; // User agent used in request/registration code.';
 	}
 
 	$content = implode("\n",$content);
@@ -212,4 +212,22 @@ function generatePaymentLink($number, $sku)
   $checksum = md5($number."abc");
   $link = $base.$number.$middle.$checksum.$end;
   return $link;
+}
+
+// Gets mime type of a file using various methods
+function get_mime($file) {
+	if (function_exists("finfo_file")) {
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
+		$mime = finfo_file($finfo, $file);
+		finfo_close($finfo);
+		return $mime;
+	} else if (function_exists("mime_content_type")) {
+		return mime_content_type($file);
+	} else if (!strncasecmp(PHP_OS, 'WIN', 3) == 0 && !stristr(ini_get("disable_functions"), "shell_exec")) {
+		$file = escapeshellarg($file);
+		$mime = shell_exec("file -bi " . $file);
+		return $mime;
+	} else {
+		return false;
+	}
 }

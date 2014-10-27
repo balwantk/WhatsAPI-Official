@@ -8,10 +8,10 @@ wh_identity:            'your_whatsapp_identity_here'
 wh_password:            'your_whatsapp_password_here'
 wh_nickname:            'your_whatsapp_nickname_here'
 
-wh_md5:                 'Vu6nzOKzMttaMOYKo7YkEw=='
-wh_version:             '2.11.419'
+wh_version:             '2.11.422'
 wh_device:              'Android'
-wh_user_agent:          'WhatsApp/2.11.419 Android/4.3 Device/GalaxyS3'
+wh_user_agent:          'WhatsApp/2.11.422 Android/4.3 Device/GalaxyS3'
+wh_md5:                 'fjwVxyGxveeMtXfbBZX5+A==' # .422
 
 wh_challenge_file:      'nextChallenge.dat'
 wh_debug:               'true'

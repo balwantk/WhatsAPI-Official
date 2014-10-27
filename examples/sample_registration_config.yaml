@@ -5,10 +5,10 @@ phone_language_code:    'en'
 phone_number:           '919822012345' # With country code without + or 00
 wh_nickname:            'Vader'
 
-wh_md5:                 'Vu6nzOKzMttaMOYKo7YkEw=='
-wh_version:             '2.11.419'
+wh_version:             '2.11.422'
 wh_device:              'Android'
-wh_user_agent:          'WhatsApp/2.11.419 Android/4.3 Device/GalaxyS3'
+wh_user_agent:          'WhatsApp/2.11.422 Android/4.3 Device/GalaxyS3'
+wh_md5:                 'fjwVxyGxveeMtXfbBZX5+A==' # .422
 
 wh_challenge_file:      'nextChallenge.dat' # This can be renamed to something more specific to the phone number like 919822012345Chal.dat
 wh_debug:               'true'

@@ -127,7 +127,7 @@ interface WhatsAppEventListener {
 
     function onGetGroupsInfo(
         $phone, // The user phone number including the country code.
-        $groupList // Array with the the groupinfo.
+        $groupList // Array with the groupinfo.
     );
 
     function onGetGroupsSubject(
@@ -277,10 +277,10 @@ interface WhatsAppEventListener {
     );
 
     function onGroupsChatisCreated(
-        $phone,
-        $creator,
-        $gId,
-        $subject
+        $phone, // The user phone number including the country code.
+        $creator, // The group chat creator.
+        $gId, // The group JID.
+        $subject // The group subject.
     );
 
     function onGroupsChatEnd(
@@ -374,6 +374,32 @@ interface WhatsAppEventListener {
     function onPing(
         $phone, // The user phone number including the country code.
         $msgid // The message id.
+    );
+
+    function onGetServicePricing(
+        $phone, //the user phone number including country code.
+        $price, //price string.
+        $cost, //cost int.
+        $currency, //currency-code.
+        $expiration //the unix time when account expires.
+    );
+
+    function onGetExtendAccount(
+        $phone, //the user phone number including country code.
+        $kind, //kind-string, e.g "free"
+        $status, //status string.
+        $creation, //unix timestamp of account creation.
+        $expiration //the unix time when account expires.
+    );
+
+    function onGetNormalizedJid(
+        $phone, //the user phone number including country code.
+        $result //the normalized jid 
+    );
+
+    function onGetBroadcastLists(
+        $phone, //the user phone number including country code.
+        $broadcastLists //a multidimensional array with the lists 
     );
 
     function onPresence(

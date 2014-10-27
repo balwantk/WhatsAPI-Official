@@ -46,19 +46,18 @@ class WhatsProt
     const WHATSAPP_REQUEST_HOST = 'v.whatsapp.net/v2/code';      // The request code host.
     const WHATSAPP_SERVER = 's.whatsapp.net';               // The hostname used to login/send messages.
     const WHATSAPP_UPLOAD_HOST = 'https://mms.whatsapp.net/client/iphone/upload.php'; // The upload host.
-    const WHATSAPP_VER_CHECKER = 'https://coderus.openrepos.net/whitesoft/whatsapp_version'; // Check WhatsApp version
 
     const WHATSAPP_DEVICE = 'Android';                      // The device name.
-    const WHATSAPP_VER = '2.11.416';                // The WhatsApp version.
-    const WHATSAPP_USER_AGENT = 'WhatsApp/2.11.416 Android/4.3 Device/GalaxyS3'; // User agent used in request/registration code.
-
+    const WHATSAPP_VER = '2.11.422';                // The WhatsApp version.
+    const WHATSAPP_USER_AGENT = 'WhatsApp/2.11.422 Android/4.3 Device/GalaxyS3'; // User agent used in request/registration code.
+    const WHATSAPP_VER_CHECKER = 'https://coderus.openrepos.net/whitesoft/whatsapp_version'; // Check WhatsApp version
 
     /**
      * Property declarations.
      */
 
     protected $challengeFilename = 'nextChallenge.dat';
-    protected $classesMd5        = "Vu6nzOKzMttaMOYKo7YkEw=="; // 2.11.419
+    protected $classesMd5        = "fjwVxyGxveeMtXfbBZX5+A=="; // 2.11.422
 
     protected $accountInfo;             // The AccountInfo object.
     protected $challengeData;           //
@@ -190,6 +189,7 @@ class WhatsProt
 
     /**
      * Add message to the outgoing queue.
+     * @param $node
      */
     public function addMsgOutQueue($node)
     {
@@ -463,17 +463,12 @@ class WhatsProt
                 echo "\nConsider updating to: ".$WAver." It's Md5 is: ".$classesMD5."\n\n";
             }
         }
-        else if($ver>=$WAverS)
+        else if($ver<$WAverS)
         {
-          echo "\nUp to date :)\n\n";
-        }
-        else{
           $classesMD5 = file_get_contents('https://coderus.openrepos.net/whitesoft/whatsapp_classes');
 
           updateData('token.php', $WAver, $classesMD5);
           updateData('whatsprot.class.php', $WAver);
-
-          echo "\n Token, User Agent and version were updated :)\n";
         }
 
         $Socket = fsockopen(static::WHATSAPP_HOST, static::PORT);
@@ -628,9 +623,11 @@ class WhatsProt
      *
      * Approx 20 (unverified) is the maximum number of targets
      *
-     * @param  array  $targets       An array of numbers to send to.
-     * @param  string  $path          URL or local path to the audio file to send
-     * @param  bool $storeURLmedia Keep a copy of the audio file on your server
+     * @param array  $targets       An array of numbers to send to.
+     * @param string $path          URL or local path to the audio file to send
+     * @param bool   $storeURLmedia Keep a copy of the audio file on your server
+     * @param int    $fsize
+     * @param string $fhash
      */
     public function sendBroadcastAudio($targets, $path, $storeURLmedia = false, $fsize = 0, $fhash = "")
     {
@@ -648,9 +645,12 @@ class WhatsProt
      *
      * Approx 20 (unverified) is the maximum number of targets
      *
-     * @param  array  $targets       An array of numbers to send to.
-     * @param  string  $path          URL or local path to the image file to send
-     * @param  bool $storeURLmedia Keep a copy of the audio file on your server
+     * @param array  $targets       An array of numbers to send to.
+     * @param string $path          URL or local path to the image file to send
+     * @param bool   $storeURLmedia Keep a copy of the audio file on your server
+     * @param int    $fsize
+     * @param string $fhash
+     * @param string $caption
      */
     public function sendBroadcastImage($targets, $path, $storeURLmedia = false, $fsize = 0, $fhash = "", $caption = "")
     {
@@ -715,9 +715,12 @@ class WhatsProt
      *
      * Approx 20 (unverified) is the maximum number of targets
      *
-     * @param  array  $targets       An array of numbers to send to.
-     * @param  string  $path          URL or local path to the video file to send
-     * @param  bool $storeURLmedia Keep a copy of the audio file on your server
+     * @param array   $targets       An array of numbers to send to.
+     * @param string  $path          URL or local path to the video file to send
+     * @param bool    $storeURLmedia Keep a copy of the audio file on your server
+     * @param int     $fsize
+     * @param string  $fhash
+     * @param string  $caption
      */
     public function sendBroadcastVideo($targets, $path, $storeURLmedia = false, $fsize = 0, $fhash = "", $caption = "")
     {
@@ -725,6 +728,36 @@ class WhatsProt
             $targets = array($targets);
         }
         $this->sendMessageVideo($targets, $path, $storeURLmedia, $fsize, $fhash, $caption);
+    }
+
+    /**
+     * Delete Broadcast lists
+     *
+     * @param  string array $lists
+     * Contains the broadcast-id list
+     */
+    public function sendDeleteBroadcastLists($lists)
+    {
+        $msgId = $this->createMsgId("delete_list_");
+        $listNode = array();
+        if($lists != null && count($lists) > 0)
+        {
+          for($i = 0; $i < count($lists); $i++)
+          {
+            $listNode[$i] = new ProtocolNode("list", array("id" => $lists[$i]), null, null);
+          }
+        }else{
+          $listNode = null;
+        }
+        $deleteNode = new ProtocolNode("delete", null, $listNode, null);
+        $node = new ProtocolNode("iq", array(
+          "id" => $msgId,
+          "xmlns" => "w:b",
+          "type" => "set",
+          "to" => "s.whatsapp.net"
+        ), array($deleteNode), null);
+
+        $this->sendNode($node);
     }
 
     /**
@@ -862,6 +895,52 @@ class WhatsProt
     }
 
     /**
+     * Send a request to get privacy settings
+     */
+    public function sendGetPrivacySettings()
+    {
+      $msgId = $this->createMsgId("get_privacy_settings_");
+      $privacyNode = new ProtocolNode("privacy", null, null, null);
+      $node = new ProtocolNode("iq", array(
+        "to" => static::WHATSAPP_SERVER,
+        "id" => $msgId,
+        "xmlns" => "privacy",
+        "type" => "get"
+      ), array($privacyNode), null);
+
+      $this->sendNode($node);
+      $this->waitForServer($msgId);
+    }
+
+   /**
+    * Set privacy of 'last seen', status or profile picture
+    * to All, contacts or none
+    *
+    * @param string $category
+    *   Options: 'last', 'status' or 'profile'
+    * @param string $value
+    *   Options: 'all', 'contacts' or 'none'
+    */
+    public function sendSetPrivacySettings($category, $value)
+    {
+      $msgId = $this->createMsgId("send_privacy_settings_");
+      $categoryNode = new ProtocolNode("category", array(
+        "name" => $category,
+        "value" => $value
+      ), null, null);
+      $privacyNode = new ProtocolNode("privacy", null, array($categoryNode), null);
+      $node = new ProtocolNode("iq", array(
+        "to" => static::WHATSAPP_SERVER,
+        "type" => "set",
+        "id" => $msgId,
+        "xmlns" => "privacy"
+      ), array($privacyNode), null);
+
+      $this->sendNode($node);
+      $this->waitForServer($msgId);
+    }
+
+    /**
      * Get profile picture of specified user
      *
      * @param string $number
@@ -924,6 +1003,144 @@ class WhatsProt
                 ), array($child), null);
         $this->sendNode($node);
     }
+
+	/**
+	* Send a request to get the current service pricing
+	*
+	*  @param string $lg
+	*   Language
+	*  @param string $lc
+	*   Country
+	*/
+	public function sendGetServicePricing($lg, $lc)
+	{
+		$msgId = $this->createMsgId("get_service_pricing_");
+		$pricingNode = new ProtocolNode("pricing", array(
+			"lg" => $lg,
+			"lc" => $lc
+		), null, null);
+		$node = new ProtocolNode("iq", array(
+			"id" => $msgId,
+			"xmlns" => "urn:xmpp:whatsapp:account",
+			"type" => "get",
+			"to" => "s.whatsapp.net"
+			), array($pricingNode), null);
+		$this->sendNode($node);
+	}
+
+	/**
+	* Send a request to extend the account
+	*/
+	public function sendExtendAccount()
+	{
+		$msgId = $this->createMsgId("extend_account_");
+		$extendingNode = new ProtocolNode("extend", null, null, null);
+		$node = new ProtocolNode("iq", array(
+			"id" => $msgId,
+			"xmlns" => "urn:xmpp:whatsapp:account",
+			"type" => "set",
+			"to" => "s.whatsapp.net"
+			), array($extendingNode), null);
+		$this->sendNode($node);
+	}
+
+  /**
+	* Gets all the broadcast lists for an account
+	*/
+	public function sendGetBroadcastLists()
+	{
+		$msgId = $this->createMsgId("get_lists_");
+		$listsNode = new ProtocolNode("lists", null, null, null);
+		$node = new ProtocolNode("iq", array(
+			"id" => $msgId,
+			"xmlns" => "w:b",
+			"type" => "get",
+			"to" => "s.whatsapp.net"
+			), array($listsNode), null);
+		$this->sendNode($node);
+	}
+
+	/**
+	* Send a request to get the normalized mobile number respresenting the JID
+	*
+	*  @param string $countryCode
+	*   Contry Code
+	*  @param string $number
+	*   Mobile Number
+	*/
+	public function sendGetNormalizedJid($countryCode, $number)
+	{
+		$msgId = $this->createMsgId("get_normalized_jid_");
+		$ccNode = new ProtocolNode("cc", null, null, $countryCode);
+		$inNode = new ProtocolNode("in", null, null, $number);
+		$normalizeNode = new ProtocolNode("normalize", null, array($ccNode, $inNode), null);
+		$node = new ProtocolNode("iq", array(
+			"id" => $msgId,
+			"xmlns" => "urn:xmpp:whatsapp:account",
+			"type" => "get",
+			"to" => "s.whatsapp.net"
+			), array($normalizeNode), null);
+		$this->sendNode($node);
+	}
+
+  /**
+  * Removes an account from WhatsApp
+  *
+  * @param string $lg
+  * Language
+  * @param string $lc
+  * Country
+  * @param string $feedback
+  * User Feedback
+  */
+  public function sendRemoveAccount($lg = null, $lc = null, $feedback = null)
+  {
+    $msgId = $this->createMsgId("removeaccount_");
+    if($feedback != null && strlen($feedback) > 0)
+    {
+        if($lg == null) {
+            $lg = "";
+        }
+
+        if($lc == null) {
+            $lc = "";
+        }
+
+        $child = new ProtocolNode("body", array(
+            "lg" => $lg,
+            "lc" => $lc
+        ), null, $feedback);
+        $childNode = array($child);
+    }else{
+        $childNode = null;
+    }
+
+    $removeNode = new ProtocolNode("remove", null, $childNode, null);
+    $node = new ProtocolNode("iq", array(
+        "to" => "s.whatsapp.net",
+        "xmlns" => "urn:xmpp:whatsapp:account",
+        "type" => "get",
+        "id" => $msgId
+    ), array($removeNode), null);
+
+    $this->sendNode($node);
+  }
+
+  /**
+  * Send a ping to the server
+  */
+	public function sendPing()
+  {
+    $msgId = $this->createMsgId("ping_");
+    $pingNode = new ProtocolNode("ping", null, null, null);
+    $node = new ProtocolNode("iq", array(
+      "id" => $msgId,
+      "xmlns" => "w:p",
+      "type" => "get",
+      "to" => "s.whatsapp.net"
+    ), array($pingNode), null);
+    $this->sendNode($node);
+  }
 
     /**
      * Get the current status message of a specific user.
@@ -993,7 +1210,7 @@ class WhatsProt
         return $groupId;
     }
 
-    public function SendSetGroupSubject($gjid, $subject)
+    public function sendSetGroupSubject($gjid, $subject)
     {
         $child = new ProtocolNode("subject", array("value" => $subject), null, null);
         $node = new ProtocolNode("iq", array(
@@ -1069,10 +1286,11 @@ class WhatsProt
      */
     public function sendGroupsParticipantsAdd($groupId, $participants)
     {
+        $msgId = $this->createMsgId("add_group_participants_");
         if(!is_array($participants)) {
             $participants = array($participants);
         }
-        $this->sendGroupsChangeParticipants($groupId, $participants, 'add');
+        $this->sendGroupsChangeParticipants($groupId, $participants, 'add', $msgId);
     }
 
     /**
@@ -1085,10 +1303,86 @@ class WhatsProt
      */
     public function sendGroupsParticipantsRemove($groupId, $participants)
     {
+        $msgId = $this->createMsgId("remove_group_participants_");
         if(!is_array($participants)) {
             $participants = array($participants);
         }
-        $this->sendGroupsChangeParticipants($groupId, $participants, 'remove');
+        $this->sendGroupsChangeParticipants($groupId, $participants, 'remove', $msgId);
+    }
+
+    /**
+     * Promote participant(s) of a group
+     * Makes a participant admin of a group
+     *
+     * @param string $gId          The group ID.
+     * @param array  $participants An array with the participants numbers to promote
+     */
+    public function sendPromoteParticipants($gId, $participants)
+    {
+      $msgId = $this->createMsgId("promote_group_participants_");
+      if(!is_array($participants)) {
+          $participants = array($participants);
+      }
+      $this->sendGroupsChangeParticipants($gId, $participants, "promote", $msgId);
+    }
+
+    /**
+     * Demote participant(s) of a group.
+     * Remove participant of being admin of a group.
+     *
+     * @param string $gId          The group ID.
+     * @param array  $participants An array with the participants numbers to demote
+     */
+    public function sendDemoteParticipants($gId, $participants)
+    {
+      $msgId = $this->createMsgId("demote_group_participants_");
+      if(!is_array($participants)) {
+          $participants = array($participants);
+      }
+      $this->sendGroupsChangeParticipants($gId, $participants, "demote", $msgId);
+    }
+
+   /**
+    * Lock group: Paritipants cant change group subject or
+    *             profile picture except admin
+    *
+    * @param string $gId The group ID.
+    */
+    public function sendLockGroup($gId)
+    {
+      $msgId = $this->createMsgId("lock_group_");
+      $lockedNode = new ProtocolNode("locked", null, null, null);
+      $node = new ProtocolNode("iq", array(
+        "id" => $msgId,
+        "xmlns" => "w:g2",
+        "type" => "set",
+        "to" => $this->getJID($gId)
+      ), array($lockedNode), null);
+
+      $this->sendNode($node);
+      $this->waitForServer($msgId);
+    }
+
+    /**
+     * Unlock group: Any participant can change
+     *               group subject or profile picture
+     *
+     *
+     * @param string $gId The group ID.
+     */
+    public function sendUnlockGroup($gId)
+    {
+      $msgId = $this->createMsgId("unlock_group_");
+      $unlockedNode = new ProtocolNode("unlocked", null, null, null);
+      $node = new ProtocolNode("iq", array(
+        "id" => $msgId,
+        "xmlns" => "w:g2",
+        "type" => "set",
+        "to" => $this->getJID($gId)
+      ), array($unlockedNode), null);
+
+      $this->sendNode($node);
+      $this->waitForServer($msgId);
     }
 
     /**
@@ -1112,13 +1406,13 @@ class WhatsProt
     }
 
     /**
-     * Send audio to the user/group.     *
+     * Send audio to the user/group.
      *
-     * @param $to
-     *   The recipient.
-     * @param string $filepath
-     *   The url/uri to the audio file.
-     * @param  bool $storeURLmedia Keep copy of file
+     * @param string $to            The recipient.
+     * @param string $filepath      The url/uri to the audio file.
+     * @param bool   $storeURLmedia Keep copy of file
+     * @param int    $fsize
+     * @param string $fhash
      * @return bool
      */
     public function sendMessageAudio($to, $filepath, $storeURLmedia = false, $fsize = 0, $fhash = "")
@@ -1149,14 +1443,12 @@ class WhatsProt
     /**
      * Send an image file to group/user
      *
-     * @param  string $to
-     *  Recipient number
-     * @param  string $filepath
-     *   The url/uri to the image file.
-     * @param  bool $storeURLmedia Keep copy of file
-     * @param  int $fsize size of the media file
-     * @param string $fhash base64 hash of the media file
-     *
+     * @param string $to            Recipient number
+     * @param string $filepath      The url/uri to the image file.
+     * @param bool   $storeURLmedia Keep copy of file
+     * @param int    $fsize         size of the media file
+     * @param string $fhash         base64 hash of the media file
+     * @param string $caption
      * @return bool
      */
     public function sendMessageImage($to, $filepath, $storeURLmedia = false, $fsize = 0, $fhash = "", $caption = "")
@@ -1227,13 +1519,12 @@ class WhatsProt
     /**
      * Send a video to the user/group.
      *
-     * @param  string $to
-     *   The recipient to send.
-     * @param string $filepath
-     *   The url/uri to the MP4/MOV video.
-     * @param  bool $storeURLmedia Keep a copy of media file.
-	 * @param  int $fsize size of the media file
-     * @param string $fhash base64 hash of the media file
+     * @param string $to            The recipient to send.
+     * @param string $filepath      The url/uri to the MP4/MOV video.
+     * @param bool   $storeURLmedia Keep a copy of media file.
+     * @param int    $fsize         size of the media file
+     * @param string $fhash         base64 hash of the media file
+     * @param string $caption
      *
      * @return bool
      */
@@ -1390,6 +1681,25 @@ class WhatsProt
         $this->sendSetPicture($this->phoneNumber, $path);
     }
 
+    /*
+    *	Removes the profile photo
+    */
+	public function sendRemoveProfilePicture() {
+		$picture = new ProtocolNode("picture", null, null, null);
+
+		$thumb = new ProtocolNode("picture", array("type" => "preview"), null, null);
+
+		$hash = array();
+		$nodeID = $this->createMsgId("setphoto");
+		$hash["id"] = $nodeID;
+		$hash["to"] = $this->getJID($this->phoneNumber);
+		$hash["type"] = "set";
+		$hash["xmlns"] = "w:profile:picture";
+		$node = new ProtocolNode("iq", $hash, array($picture, $thumb), null);
+
+		$this->sendNode($node);
+	}
+
     /**
      * Set the recovery token for your account to allow you to
      * retrieve your password at a later stage.
@@ -1477,6 +1787,7 @@ class WhatsProt
 
     /**
      * Sets the bind of the new message.
+     * @param $bind
      */
     public function setNewMessageBind($bind)
     {
@@ -1549,6 +1860,7 @@ class WhatsProt
     /**
      * Wait for Whatsapp server to acknowledge *it* has received message.
      * @param  string $id The id of the node sent that we are awaiting acknowledgement of.
+     * @param int     $timeout
      */
     public function waitForServer($id, $timeout = 5)
     {
@@ -1629,18 +1941,16 @@ class WhatsProt
 
     /**
      * Add stream features.
-     * @param bool $profileSubscribe
      *
-     * @return ProtocolNode
-     *   Return itself.
+     * @return ProtocolNode Return itself.
      */
     protected function createFeaturesNode()
     {
         $readreceipts = new ProtocolNode("readreceipts", null, null, null);
-    	$groupsv2 = new ProtocolNode("groups_v2", null, null, null);
-    	$privacy = new ProtocolNode("privacy", null, null, null);
-
-        $parent = new ProtocolNode("stream:features", null, array($readreceipts, $groupsv2, $privacy), null);
+        $groupsv2 = new ProtocolNode("groups_v2", null, null, null);
+        $privacy = new ProtocolNode("privacy", null, null, null);
+        $presencev2 = new ProtocolNode("presence", null, null, null);
+        $parent = new ProtocolNode("stream:features", null, array($readreceipts, $groupsv2, $privacy, $presencev2), null);
 
         return $parent;
     }
@@ -1748,7 +2058,9 @@ class WhatsProt
     }
 
     /**
-     * Send the nodes to the Whatsapp server to log in
+     * Send the nodes to the Whatsapp server to log in.
+     *
+     * @throws Exception
      */
     protected function doLogin()
     {
@@ -1942,13 +2254,7 @@ class WhatsProt
             if ($this->mediaFileInfo['filesize'] < $maxsizebytes) {
                 $this->mediaFileInfo['filepath'] = $filepath;
                 $this->mediaFileInfo['fileextension'] = pathinfo($filepath, PATHINFO_EXTENSION);
-                //TODO
-                //Get Mime type using finfo.
-//                $finfo = new finfo_open(FILEINFO_MIME_TYPE);
-//                $this->_mediafileinfo['filemimetype'] = finfo_file($finfo, $filepath);
-//                finfo_close($finfo);
-                //mime_content_type deprecated
-                $this->mediaFileInfo['filemimetype'] = mime_content_type($filepath);
+                $this->mediaFileInfo['filemimetype'] = get_mime($filepath);
                 return true;
             } else {
                 //File too big
@@ -2011,8 +2317,9 @@ class WhatsProt
     /**
      * Process inbound data.
      *
-     * @param string $data
-     *   The data to process.
+     * @param      $data
+     * @param bool $autoReceipt
+     * @throws Exception
      */
     protected function processInboundData($data, $autoReceipt = true)
     {
@@ -2026,7 +2333,9 @@ class WhatsProt
      * Will process the data from the server after it's been decrypted and parsed.
      *
      * This also provides a convenient method to use to unit test the event framework.
-     *
+     * @param ProtocolNode $node
+     * @param bool         $autoReceipt
+     * @throws Exception
      */
     protected function processInboundDataNode(ProtocolNode $node, $autoReceipt = true) {
         $this->debugPrint($node->nodeString("rx  ") . "\n");
@@ -2420,6 +2729,55 @@ class WhatsProt
                         $groupList
                     );
                 }
+            }
+            if ($node->nodeIdContains("get_lists")) {
+                $broadcastLists = array();
+                if ($node->getChild(0) != null) {
+                    $childArray = $node->getChildren();
+                    foreach ($childArray as $list) {
+                        foreach ( $list->getChildren() as $sublist) {
+                            $id = $sublist->getAttribute("id");
+                            $name = $sublist->getAttribute("name");
+                            $broadcastLists[$id]['name'] = $name;
+                            $recipients = array();
+                            foreach ($sublist->getChildren() as $recipient) {
+                                array_push($recipients, $recipient->getAttribute('jid'));
+                            }
+                            $broadcastLists[$id]['recipients'] = $recipients;
+                        }
+                    }
+                }
+                $this->eventManager()->fireGetBroadcastLists(
+                  $this->phoneNumber,
+                  $broadcastLists
+                );
+            }
+            if($node->getChild("pricing") != null)
+            {
+              $this->eventManager()->fireGetServicePricing(
+                $this->phoneNumber,
+                $node->getChild(0)->getAttribute("price"),
+                $node->getChild(0)->getAttribute("cost"),
+                $node->getChild(0)->getAttribute("currency"),
+                $node->getChild(0)->getAttribute("expiration")
+              );
+            }
+            if($node->getChild("extend") != null)
+            {
+              $this->eventManager()->fireGetExtendAccount(
+                $this->phoneNumber,
+                $node->getChild("account")->getAttribute("kind"),
+                $node->getChild("account")->getAttribute("status"),
+                $node->getChild("account")->getAttribute("creation"),
+                $node->getChild("account")->getAttribute("expiration")
+              );
+            }
+            if($node->getChild("normalize") != null)
+            {
+              $this->eventManager()->fireGetNormalizedJid(
+                $this->phoneNumber,
+                $node->getChild(0)->getAttribute("result")
+              );
             }
             if($node->getChild("status") != null)
             {
@@ -2854,12 +3212,14 @@ class WhatsProt
     /**
      * Checks that the media file to send is of allowable filetype and within size limits.
      *
-     * @param string $filepath The URL/URI to the media file
-     * @param int $maxSize Maximim filesize allowed for media type
-     * @param string $to Recipient ID/number
-     * @param string $type media filetype. 'audio', 'video', 'image'
-     * @param array $allowedExtensions An array of allowable file types for the media file
-     * @param bool $storeURLmedia Keep a copy of the media file
+     * @param string $filepath          The URL/URI to the media file
+     * @param int    $maxSize           Maximim filesize allowed for media type
+     * @param string $to                Recipient ID/number
+     * @param string $type              media filetype. 'audio', 'video', 'image'
+     * @param array  $allowedExtensions An array of allowable file types for the media file
+     * @param bool   $storeURLmedia     Keep a copy of the media file
+     * @param string $caption
+     *
      * @return bool
      */
     protected function sendCheckAndSendMedia($filepath, $maxSize, $to, $type, $allowedExtensions, $storeURLmedia, $caption = "")
@@ -2884,8 +3244,9 @@ class WhatsProt
 
     /**
      * Send a broadcast
-     * @param  array $targets Array of numbers to send to
-     * @param  object $node
+     * @param array  $targets Array of numbers to send to
+     * @param object $node
+     * @param        $type
      * @return string
      */
     protected function sendBroadcast($targets, $node, $type)
@@ -2962,14 +3323,12 @@ class WhatsProt
     /**
      * Change participants of a group.
      *
-     * @param string $groupId
-     *   The group ID.
-     * @param array $participants
-     *   An array with the participants.
-     * @param string $tag
-     *   The tag action. 'add' or 'remove'
+     * @param string $groupId      The group ID.
+     * @param array  $participants An array with the participants.
+     * @param string $tag          The tag action. 'add' or 'remove'
+     * @param        $id
      */
-    protected function sendGroupsChangeParticipants($groupId, $participants, $tag)
+    protected function sendGroupsChangeParticipants($groupId, $participants, $tag, $id)
     {
         $_participants = array();
         foreach ($participants as $participant) {
@@ -2980,9 +3339,9 @@ class WhatsProt
         $child = new ProtocolNode($tag, $childHash, $_participants, "");
 
         $setHash = array();
-        $setHash["id"] = $this->createMsgId("participants");
+        $setHash["id"] = $id;
         $setHash["type"] = "set";
-        $setHash["xmlns"] = "w:g";
+        $setHash["xmlns"] = "w:g2";
         $setHash["to"] = $this->getJID($groupId);
 
         $node = new ProtocolNode("iq", $setHash, array($child), "");
@@ -2994,10 +3353,10 @@ class WhatsProt
     /**
      * Send node to the servers.
      *
-     * @param $to
-     *   The recipient to send.
-     * @param $node ProtocolNode
-     *   The node that contains the message.
+     * @param              $to
+     * @param ProtocolNode $node
+     * @param null         $id
+     * @return null|string
      */
     protected function sendMessageNode($to, $node, $id = null)
     {
@@ -3040,8 +3399,8 @@ class WhatsProt
     /**
      * Tell the server we received the message.
      *
-     * @param ProtocolNode $msg
-     *   The ProtocolTreeNode that contains the message.
+     * @param ProtocolNode $msg The ProtocolTreeNode that contains the message.
+     * @param null         $type
      */
     protected function sendMessageReceived($msg, $type = null)
     {
@@ -3065,6 +3424,7 @@ class WhatsProt
     /**
      * Send node to the WhatsApp server.
      * @param ProtocolNode $node
+     * @param bool         $encrypt
      */
     protected function sendNode($node, $encrypt = true)
     {
@@ -3075,16 +3435,12 @@ class WhatsProt
     /**
      * Send request to upload file
      *
-     * @param $b64hash
-     *  Base64 hash of file
-     * @param string $type
-     *  File type
-     * @param $size
-     *  File size
-     * @param string $filepath
-     *  Path to image file
-     * @param string $to
-     *  Recipient
+     * @param string $b64hash  A base64 hash of file
+     * @param string $type     File type
+     * @param string $size     File size
+     * @param string $filepath Path to image file
+     * @param string $to       Recipient
+     * @param string $caption
      */
     protected function sendRequestFileUpload($b64hash, $type, $size, $filepath, $to, $caption = "")
     {

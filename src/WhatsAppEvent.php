@@ -12,12 +12,13 @@ require_once dirname(__FILE__).'/events/WhatsAppEventListenerLegacyAdapter.php';
  */
 class WhatsAppEvent
 {
-   /**
+
+    /**
      * Contains all of our event listeners.
      *
-    * Note: This shouldn't be static, and may change in future implementations.
-    *
-     * @var WhatsAppEventListener
+     * Note: This shouldn't be static, and may change in future implementations.
+     *
+     * @var array
      */
     static $event_listeners = array();
 
@@ -59,10 +60,8 @@ class WhatsAppEvent
     /**
      * Binds a callback to a event.
      *
-     * @param string $event
-     *   Name of the event.
-     * @param string $listener
-     *   The method or function to call.
+     * @param string $event Name of the event.
+     * @param        $listener
      *
      * @deprecated Use addEventListener instead.
      */
@@ -93,7 +92,7 @@ class WhatsAppEvent
     /**
      * Fires the callback for each listener.
      *
-     * @param function $callbackEvent
+     * @param callable $callbackEvent
      */
     private function fireCallback($callbackEvent) {
         array_map($callbackEvent, self::$event_listeners);
@@ -836,6 +835,52 @@ class WhatsAppEvent
     ) {
         $callbackEvent = function(WhatsAppEventListener $listener) use ($phone, $author, $kind, $status, $creation, $expiration) {
             $listener->onPaidAccount($phone, $author, $kind, $status, $creation, $expiration);
+        };
+        $this->fireCallback($callbackEvent);
+    }
+
+    function fireGetServicePricing(
+        $phone,
+        $price,
+        $cost,
+        $currency,
+        $expiration
+    ) {
+        $callbackEvent = function(WhatsAppEventListener $listener) use ($phone, $price, $cost, $currency, $expiration) {
+            $listener->onGetServicePricing($phone, $price, $cost, $currency, $expiration);
+        };
+        $this->fireCallback($callbackEvent);
+    }
+
+    function fireGetExtendAccount(
+        $phone,
+        $kind,
+        $status,
+        $creation,
+        $expiration
+    ) {
+        $callbackEvent = function(WhatsAppEventListener $listener) use ($phone, $kind, $status, $creation, $expiration) {
+            $listener->onGetExtendAccount($phone, $kind, $status, $creation, $expiration);
+        };
+        $this->fireCallback($callbackEvent);
+    }
+
+    function fireGetNormalizedJid(
+        $phone,
+        $result
+    ) {
+        $callbackEvent = function(WhatsAppEventListener $listener) use ($phone, $result) {
+            $listener->onGetNormalizedJid($phone, $result);
+        };
+        $this->fireCallback($callbackEvent);
+    }
+
+    function fireGetBroadcastLists(
+        $phone,
+        $broadcastLists
+    ) {
+        $callbackEvent = function(WhatsAppEventListener $listener) use ($phone, $broadcastLists) {
+            $listener->onGetBroadcastLists($phone, $broadcastLists);
         };
         $this->fireCallback($callbackEvent);
     }

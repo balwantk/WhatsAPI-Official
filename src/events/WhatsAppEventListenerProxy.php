@@ -8,9 +8,13 @@
  * Funnels all events through the abstract handleEvent method.
 */
 abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
+
     /**
      *  This method will get all event calls.
      *
+     * @param       $eventName
+     * @param array $arguments
+     * @return
      */
     abstract protected function handleEvent($eventName, array $arguments );
 
@@ -407,6 +411,40 @@ abstract class WhatsAppEventListenerProxy implements WhatsAppEventListener {
         $status,
         $creation,
         $expiration
+    ) {
+        $this->handleEvent(__FUNCTION__, func_get_args());
+    }
+
+    function onGetServicePricing(
+        $phone,
+        $price,
+        $cost,
+        $currency,
+        $expiration
+    ) {
+        $this->handleEvent(__FUNCTION__, func_get_args());
+    }
+
+    function onGetExtendAccount(
+        $phone,
+        $kind,
+        $status,
+        $creation,
+        $expiration
+    ) {
+        $this->handleEvent(__FUNCTION__, func_get_args());
+    }
+
+    function onGetNormalizedJid(
+        $phone,
+        $result
+    ) {
+        $this->handleEvent(__FUNCTION__, func_get_args());
+    }
+
+    function onGetBroadcastLists(
+        $phone,
+        $broadcastLists
     ) {
         $this->handleEvent(__FUNCTION__, func_get_args());
     }

@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 .idea/
 vendor/
 configs/
 apps/
 *.dat
+/nbproject
+#composer.phar
+.env.*.php
+.env.php
+.DS_Store
+Thumbs.db
